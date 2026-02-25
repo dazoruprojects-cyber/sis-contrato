@@ -1,7 +1,7 @@
 {
   "name": "Dazoru Proformas",
   "short_name": "Dazoru",
-  "start_url": "./proforma.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#e2d2b8",

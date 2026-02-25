@@ -3,7 +3,7 @@ const CACHE = "dazoru-proforma-cache-v2";
 // archivos base que deben quedar offline sí o sí
 const ASSETS = [
   "./",
-  "./proforma.html",
+  "./index.html",
   "./manifest.json",
   "./sw.js"
 ];
@@ -38,7 +38,7 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => {});
           return res;
         })
-        .catch(() => caches.match("./proforma.html"));
+        .catch(() => caches.match("./index.html"));
     })
   );
 });

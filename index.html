@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-  <title>Proforma / Cotización - Dazoru Projects</title>
+  <title>Proforma / Cotización</title>
 
   <!-- PWA -->
   <meta name="theme-color" content="#7d644c">
@@ -11,12 +11,19 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
+  <!-- Google Fonts (opcional, funciona offline con fallback) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Playfair+Display:wght@400;700;900&family=Lato:wght@400;700&family=Raleway:wght@400;700;900&family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+
   <style>
     :root{
+      /* Colores del documento (se cambian con temas) */
       --marron:#7d644c;
       --beige:#e2d2b8;
       --ink:#1b1b1b;
       --marron-claro:#bfae9f;
+      /* Colores de la app (UI oscura) */
       --paper:#ffffff;
       --bg:#0f1216;
       --card:#151a22;
@@ -30,6 +37,8 @@
       --a4h: 297mm;
       --page-margin: 10mm;
       --doc-scale: 1;
+      /* Fuente del documento */
+      --doc-font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     *{ box-sizing:border-box; }
@@ -43,10 +52,10 @@
 
     .app{
       display:grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 440px 1fr;
       gap:16px;
       padding:16px;
-      max-width: 1600px;
+      max-width: 1700px;
       margin: 0 auto;
     }
     @media (max-width: 1100px){
@@ -55,12 +64,15 @@
       .editor{ order:1; }
     }
 
+    /* ===== EDITOR ===== */
     .editor{
       background: var(--card);
       border:1px solid rgba(255,255,255,.06);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow:hidden;
+      display:flex;
+      flex-direction:column;
     }
     .editor__head{
       padding:14px 14px 10px;
@@ -69,6 +81,7 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
+      flex-shrink:0;
     }
     .editor__head h2{
       margin:0;
@@ -78,24 +91,26 @@
       color:#dbe6f3;
     }
     .editor__head .mini{
-      font-size:12px;
+      font-size:11px;
       color: var(--muted);
     }
 
     .tabs{
       display:flex;
-      gap:8px;
+      gap:6px;
       padding: 10px 12px 0;
       flex-wrap:wrap;
+      flex-shrink:0;
     }
     .tab{
       border:1px solid rgba(255,255,255,.12);
       background: transparent;
       color:#dbe6f3;
       border-radius: 999px;
-      padding:8px 10px;
+      padding:7px 11px;
       font-size:12px;
       cursor:pointer;
+      transition: all .18s;
     }
     .tab[aria-selected="true"]{
       background: rgba(226,210,184,.14);
@@ -105,8 +120,9 @@
 
     .editor__body{
       padding: 12px;
-      max-height: calc(100vh - 120px);
+      flex:1;
       overflow:auto;
+      max-height: calc(100vh - 160px);
     }
 
     .section{ display:none; }
@@ -122,28 +138,43 @@
       display:block;
       font-size:12px;
       color:#cfe0f2;
-      margin: 8px 0 6px;
+      margin: 8px 0 5px;
     }
-    input[type="text"], input[type="tel"], input[type="email"], input[type="date"], input[type="number"], textarea, select{
+    input[type="text"], input[type="tel"], input[type="email"],
+    input[type="date"], input[type="number"], textarea, select{
       width:100%;
-      padding:10px 11px;
-      border-radius: 12px;
+      padding:9px 11px;
+      border-radius: 11px;
       border:1px solid rgba(255,255,255,.10);
       background:#0f141d;
       color:#e8eef6;
       outline:none;
+      font-size:13px;
+      transition: border-color .15s;
+    }
+    input:focus, textarea:focus, select:focus{
+      border-color: rgba(226,210,184,.35);
+    }
+    input[type="color"]{
+      width:48px; height:36px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.15);
+      background:#0f141d;
+      cursor:pointer;
+      padding:3px;
     }
     input[type="file"]{
       width:100%;
-      padding:10px 11px;
-      border-radius: 12px;
+      padding:9px 11px;
+      border-radius: 11px;
       border:1px dashed rgba(255,255,255,.18);
       background:#0f141d;
       color:#cfe0f2;
+      font-size:12px;
     }
-    textarea{ min-height: 92px; resize: vertical; }
+    textarea{ min-height: 88px; resize: vertical; }
     .hint{
-      margin-top:6px;
+      margin-top:5px;
       font-size:11px;
       color: var(--muted);
       line-height:1.35;
@@ -152,21 +183,22 @@
     .btns{
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
-      padding: 12px;
+      gap:8px;
+      padding: 10px 12px;
       border-top:1px solid rgba(255,255,255,.06);
       background: rgba(0,0,0,.15);
-      position: sticky;
-      bottom:0;
+      flex-shrink:0;
     }
     button{
       border:0;
-      border-radius: 12px;
-      padding: 10px 12px;
+      border-radius: 10px;
+      padding: 9px 12px;
       font-weight:600;
       cursor:pointer;
       font-size:13px;
+      transition: opacity .15s;
     }
+    button:hover{ opacity:.88; }
     .btn-primary{ background: var(--ok); color:#072113; }
     .btn-secondary{ background: rgba(226,210,184,.18); color:#fff; border:1px solid rgba(226,210,184,.25); }
     .btn-danger{ background: rgba(255,91,91,.20); color:#fff; border:1px solid rgba(255,91,91,.35); }
@@ -182,7 +214,7 @@
     .row .left, .row .right{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .pill{
       font-size:11px;
-      padding:6px 10px;
+      padding:5px 10px;
       border-radius: 999px;
       border:1px solid rgba(255,255,255,.12);
       color:#dbe6f3;
@@ -192,7 +224,7 @@
     .items{ margin-top: 6px; display:flex; flex-direction:column; gap:10px; }
     .item{
       border:1px solid rgba(255,255,255,.10);
-      border-radius: 14px;
+      border-radius: 13px;
       padding: 10px;
       background: #0f141d;
     }
@@ -203,17 +235,17 @@
       gap:10px;
       margin-bottom:6px;
     }
-    .item__head .title{
+    .item__head .ititle{
       display:flex;
       gap:10px;
       align-items:center;
       flex-wrap:wrap;
     }
-    .item__head .title strong{ font-size:13px; }
+    .item__head .ititle strong{ font-size:13px; }
     .item__head .actions{ display:flex; gap:8px; }
     .mini-btn{
-      padding:8px 10px;
-      border-radius: 10px;
+      padding:7px 10px;
+      border-radius: 9px;
       font-size:12px;
       font-weight:700;
       border:1px solid rgba(255,255,255,.12);
@@ -230,17 +262,104 @@
       color:#dbe6f3;
       user-select:none;
     }
-    .check input{ width:18px; height:18px; }
+    .check input{ width:16px; height:16px; }
 
     .cond-list{ display:flex; flex-direction:column; gap:10px; margin-top:8px; }
     .cond{
       border:1px solid rgba(255,255,255,.10);
-      border-radius: 14px;
+      border-radius: 13px;
       padding:10px;
       background:#0f141d;
     }
     .cond__head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
     .cond__head strong{ font-size:13px; }
+
+    /* === DISEÑO TAB === */
+    .theme-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:8px;
+      margin: 6px 0 10px;
+    }
+    .theme-btn{
+      border-radius: 12px;
+      border:2px solid transparent;
+      overflow:hidden;
+      cursor:pointer;
+      background:none;
+      padding:0;
+      transition: border-color .18s, transform .15s;
+    }
+    .theme-btn:hover{ transform: scale(1.04); }
+    .theme-btn.active{ border-color: #fff; }
+    .theme-swatch{
+      display:flex;
+      flex-direction:column;
+      border-radius:10px;
+      overflow:hidden;
+    }
+    .swatch-top{ height:28px; }
+    .swatch-bot{ height:14px; }
+    .theme-name{
+      font-size:10px;
+      text-align:center;
+      color:#cfe0f2;
+      padding:4px 2px;
+    }
+
+    .font-grid{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin: 6px 0 10px;
+    }
+    .font-btn{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:11px;
+      padding: 8px 12px;
+      cursor:pointer;
+      background: #0f141d;
+      color:#dbe6f3;
+      text-align:left;
+      transition: background .15s, border-color .15s;
+    }
+    .font-btn:hover{ background: rgba(255,255,255,.06); }
+    .font-btn.active{
+      background: rgba(226,210,184,.12);
+      border-color: rgba(226,210,184,.4);
+      color:#fff;
+    }
+    .font-btn .fname{ font-size:13px; font-weight:700; }
+    .font-btn .fsample{ font-size:11px; color:#9fb0c0; }
+
+    .custom-colors{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      padding:10px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      background:#0f141d;
+    }
+    .color-field{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      color:#cfe0f2;
+    }
+
+    .section-title{
+      font-size:12px;
+      font-weight:800;
+      color:#dbe6f3;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+      margin: 14px 0 6px;
+      padding-bottom:5px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
 
     /* ===== Preview ===== */
     .preview-wrap{
@@ -262,7 +381,7 @@
       font-size:12px;
     }
     .zoom{ display:flex; align-items:center; gap:10px; }
-    .zoom input[type="range"]{ width:180px; }
+    .zoom input[type="range"]{ width:160px; }
 
     /* ===== Document A4 ===== */
     .doc{
@@ -281,6 +400,7 @@
       overflow:hidden;
       margin: 0 auto 16px;
       page-break-after: always;
+      font-family: var(--doc-font);
     }
     .page:last-child{ page-break-after: auto; }
 
@@ -324,11 +444,11 @@
     .topbar-right .tag{ font-weight:800; font-size: 12px; letter-spacing:.2px; white-space:nowrap; }
     .topbar-right .num{ font-size: 11px; opacity:.95; white-space:nowrap; }
 
-    .title{
+    .doctitle{
       text-align:center;
       font-weight:900;
       color: #1a1a1a;
-      font-size: 18px;
+      font-size: 17px;
       letter-spacing:.4px;
       margin-top: 4px;
     }
@@ -341,7 +461,7 @@
 
     .two-col{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
 
-    .box{ border:1px solid rgba(125,100,76,.35); border-radius: 12px; padding: 10px 10px 8px; }
+    .box{ border:1px solid color-mix(in srgb, var(--marron) 45%, transparent); border-radius: 12px; padding: 10px 10px 8px; }
     .box h3{
       margin:0 0 6px;
       font-size: 12px;
@@ -353,7 +473,6 @@
     .kv .k{ color:#5a5a5a; font-weight:700; }
     .kv .v{ color:#1b1b1b; }
 
-    /* Datos cliente vertical */
     .kv-client{
       display:grid;
       grid-template-columns: 130px 1fr;
@@ -371,7 +490,7 @@
     }
 
     .proposal{
-      border:1px solid rgba(125,100,76,.35);
+      border:1px solid color-mix(in srgb, var(--marron) 35%, transparent);
       border-radius: 12px;
       padding:10px;
       font-size:12px;
@@ -387,7 +506,7 @@
     .proposal .text{ white-space: pre-wrap; color:#1b1b1b; line-height:1.35; min-height: 28px; }
 
     table{ width:100%; border-collapse: collapse; font-size: 11.5px; }
-    th, td{ border: 1px solid rgba(125,100,76,.28); padding: 8px 8px; vertical-align: top; }
+    th, td{ border: 1px solid color-mix(in srgb, var(--marron) 28%, transparent); padding: 8px; vertical-align: top; }
     th{
       background: var(--beige);
       color: #2a2017;
@@ -405,80 +524,39 @@
     .totals{ display:flex; justify-content:flex-end; margin-top: 6px; }
     .totals-card{
       width: 280px;
-      border:1px solid rgba(125,100,76,.35);
+      border:1px solid color-mix(in srgb, var(--marron) 35%, transparent);
       border-radius: 12px;
       overflow:hidden;
     }
-    .totals-card .row{
+    .totals-card .trow{
       display:flex;
       justify-content:space-between;
       gap:10px;
       padding: 8px 10px;
-      border-bottom:1px solid rgba(125,100,76,.22);
+      border-bottom:1px solid color-mix(in srgb, var(--marron) 22%, transparent);
       font-size:12px;
-      margin-top:0;
     }
-    .totals-card .row:last-child{ border-bottom:0; }
-    .totals-card .row .k{ font-weight:800; color:#3b3b3b; }
-    .totals-card .row .v{ font-weight:900; }
+    .totals-card .trow:last-child{ border-bottom:0; }
+    .totals-card .trow .k{ font-weight:800; color:#3b3b3b; }
+    .totals-card .trow .v{ font-weight:900; }
     .totals-card .grand{ background: var(--marron); color:#fff; }
     .totals-card .grand .k, .totals-card .grand .v{ color:#fff; }
 
     .footer{
       margin-top:auto;
-      border-top: 1px solid rgba(125,100,76,.28);
+      border-top: 1px solid color-mix(in srgb, var(--marron) 28%, transparent);
       padding-top: 8px;
       display:flex;
-      justify-content:flex-start; /* ✅ ya no hay "Página 1/2" */
+      justify-content:flex-start;
       gap:10px;
       font-size: 10.5px;
       color:#3d3d3d;
     }
-    .footer .left{ display:flex; flex-wrap:wrap; gap:8px 12px; }
+    .footer .fleft{ display:flex; flex-wrap:wrap; gap:6px 12px; }
     .foot-pill{ display:inline-flex; gap:6px; align-items:center; }
-    .dot{ width:4px; height:4px; border-radius:99px; background: rgba(125,100,76,.8); display:inline-block; }
+    .dot{ width:4px; height:4px; border-radius:99px; background: var(--marron); display:inline-block; opacity:.7; }
 
-    /* ===== Page 2 style ===== */
-    .h2-title{
-      font-weight:900;
-      color:#6a5746;
-      font-size:13px;
-      letter-spacing:.2px;
-      margin: 8px 0 6px;
-    }
-    .detail-text{
-      font-size:11.5px;
-      line-height:1.42;
-      white-space:pre-wrap;
-      color:#2b2b2b;
-    }
-
-    .accept-title{
-      font-weight:900;
-      color:#6a5746;
-      margin: 10px 0 6px;
-      font-size:12px;
-    }
-    .accept-text{
-      font-size:11.5px;
-      line-height:1.42;
-      white-space:pre-wrap;
-      color:#2b2b2b;
-      margin-bottom:8px;
-    }
-
-    .sign2-table td{
-      height: 38px;
-      vertical-align: middle;
-      font-size: 11px;
-    }
-    .sign2-table td .line{
-      display:inline-block;
-      min-width: 120px;
-      border-bottom: 1px solid rgba(0,0,0,.55);
-      transform: translateY(-2px);
-    }
-
+    /* ===== Watermark ===== */
     .watermark{
       position:absolute;
       inset: 58mm 10mm 52mm 10mm;
@@ -495,6 +573,71 @@
       object-fit: contain;
       filter: grayscale(100%);
     }
+
+    /* Page 1 watermark (same style but positioned within content) */
+    .watermark-p1{
+      position:absolute;
+      top: 50mm;
+      left: 10mm;
+      right: 10mm;
+      bottom: 40mm;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      opacity: .08;
+      z-index: 0;
+    }
+    .watermark-p1 img{
+      width: 100mm;
+      height: 100mm;
+      object-fit: contain;
+      filter: grayscale(100%);
+    }
+
+    .page-content{ position:relative; z-index:1; display:contents; }
+
+    /* ===== Page 2 ===== */
+    .h2-title{
+      font-weight:900;
+      color: color-mix(in srgb, var(--marron) 90%, #333 10%);
+      font-size:13px;
+      letter-spacing:.2px;
+      margin: 8px 0 6px;
+    }
+    .detail-text{
+      font-size:11.5px;
+      line-height:1.42;
+      white-space:pre-wrap;
+      color:#2b2b2b;
+    }
+
+    .accept-title{
+      font-weight:900;
+      color: color-mix(in srgb, var(--marron) 90%, #333 10%);
+      margin: 10px 0 6px;
+      font-size:12px;
+    }
+    .accept-text{
+      font-size:11.5px;
+      line-height:1.42;
+      white-space:pre-wrap;
+      color:#2b2b2b;
+      margin-bottom:8px;
+    }
+
+    .sign2-table td{
+      height: 38px;
+      vertical-align: middle;
+      font-size: 11px;
+    }
+    .sign2-table td .sline{
+      display:inline-block;
+      min-width: 120px;
+      border-bottom: 1px solid rgba(0,0,0,.55);
+      transform: translateY(-2px);
+    }
+
     .page2-content{ position:relative; z-index:1; }
 
     @media screen and (max-width: 720px){
@@ -535,17 +678,28 @@
       </div>
 
       <div class="tabs" role="tablist" aria-label="Secciones">
-        <button class="tab" role="tab" aria-selected="true" data-tab="empresa">Empresa</button>
+        <button class="tab" role="tab" aria-selected="true"  data-tab="empresa">Empresa</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="cotizacion">Cotización</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="items">Ítems</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="pagina2">Página 2</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="diseno">🎨 Diseño</button>
       </div>
 
       <div class="editor__body">
-        <!-- EMPRESA -->
+
+        <!-- ===== EMPRESA ===== -->
         <section class="section active" id="tab-empresa">
-          <label>Nombre de empresa</label>
-          <input id="in_companyName" type="text" />
+          <div class="grid2">
+            <div>
+              <label>Nombre de empresa</label>
+              <input id="in_companyName" type="text" />
+            </div>
+            <div>
+              <label>Eslogan / Servicios (topbar)</label>
+              <input id="in_companySub" type="text" placeholder="Decoración • Melamina • Espejos" />
+              <div class="hint">Lo que aparece bajo el nombre en la cabecera.</div>
+            </div>
+          </div>
 
           <div class="grid2">
             <div>
@@ -577,40 +731,36 @@
             <div>
               <label>Logo (PNG/JPG)</label>
               <input id="in_logo" type="file" accept="image/png,image/jpeg" />
-              <div class="hint">Se guarda dentro del navegador (localStorage) como imagen embebida.</div>
+              <div class="hint">Se guarda en el navegador como imagen embebida.</div>
             </div>
           </div>
 
-          <label class="check" style="margin-top:12px;">
+          <div class="section-title" style="margin-top:12px;">Opciones de visualización</div>
+
+          <label class="check" style="margin-top:6px;">
             <input type="checkbox" id="in_showRucFooter" />
             Mostrar RUC en el pie de página
           </label>
-          <div class="hint">Si lo desactivas, el pie no mostrará el RUC (en ambas páginas).</div>
-
-          <label class="check" style="margin-top:10px;">
+          <label class="check" style="margin-top:8px;">
             <input type="checkbox" id="in_showWatermark" />
-            Mostrar marca de agua en Página 2
+            Marca de agua en Página 2
           </label>
-          <div class="hint">Usa el mismo logo cargado, en forma tenue (como tu ejemplo).</div>
+          <label class="check" style="margin-top:8px;">
+            <input type="checkbox" id="in_showWatermarkP1" />
+            Marca de agua también en Página 1
+          </label>
+          <div class="hint">Usa el logo cargado como marca de agua tenue en el fondo.</div>
 
-          <div class="row">
-            <div class="left">
-              <span class="pill">Colores: #7d644c / #e2d2b8</span>
-              <span class="pill">A4 • 2 páginas</span>
-              <span class="pill">Instalable como App (PWA)</span>
-            </div>
-          </div>
-
-          <div class="hint" style="margin-top:10px">
-            <b>Android/Chrome:</b> “Descargar PDF” abre la impresión. Elige <b>Guardar como PDF</b> y desactiva <b>Encabezados y pies</b> del navegador si aparece.
+          <div class="hint" style="margin-top:12px;">
+            <b>Guardar PDF (Android/Chrome):</b> "Descargar PDF" → Guardar como PDF → desactiva "Encabezados y pies" del navegador. El nombre del archivo se genera automáticamente.
           </div>
         </section>
 
-        <!-- COTIZACION -->
+        <!-- ===== COTIZACIÓN ===== -->
         <section class="section" id="tab-cotizacion">
-          <label>Título principal (sale arriba en grande)</label>
+          <label>Título principal</label>
           <input id="in_titleOverride" type="text" />
-          <div class="hint">Ejemplo: HOJA DE COTIZACIÓN - PROYECTO: MUEBLE DE BAÑO MODERNO (MIRAFLORES)</div>
+          <div class="hint">Ej: HOJA DE COTIZACIÓN - PROYECTO: MUEBLE DE BAÑO MODERNO. Si lo dejas vacío se genera automáticamente.</div>
 
           <div class="grid2" style="margin-top:8px;">
             <div>
@@ -629,31 +779,31 @@
               <input id="in_client" type="text" />
             </div>
             <div>
-              <label>Proyecto / Dirección (dato del cuadro cliente)</label>
+              <label>Proyecto / Dirección</label>
               <input id="in_project" type="text" />
             </div>
           </div>
 
-          <label>Resumen de la propuesta (texto libre)</label>
+          <label>Resumen de la propuesta</label>
           <textarea id="in_summary"></textarea>
 
           <div class="grid2" style="margin-top:8px;">
             <div>
               <label>Descuento tipo</label>
               <select id="in_discType">
-                <option value="PEN">S/ (monto)</option>
-                <option value="PCT">%</option>
+                <option value="PEN">S/ (monto fijo)</option>
+                <option value="PCT">% (porcentaje)</option>
               </select>
             </div>
             <div>
               <label>Descuento valor</label>
               <input id="in_discValue" type="number" step="0.01" min="0" />
-              <div class="hint">Si es 0, no se mostrará la línea de descuento.</div>
+              <div class="hint">Si es 0 no se muestra la línea de descuento.</div>
             </div>
           </div>
         </section>
 
-        <!-- ITEMS -->
+        <!-- ===== ÍTEMS ===== -->
         <section class="section" id="tab-items">
           <div class="row">
             <div class="left">
@@ -662,16 +812,17 @@
             </div>
           </div>
           <div class="items" id="itemsEditor"></div>
-          <div class="hint" style="margin-top:10px">
-            <b>Especificaciones:</b> varias líneas = bullets (•). Una línea = texto normal.
+          <div class="hint" style="margin-top:10px;">
+            <b>Especificaciones:</b> varias líneas = bullets (•). Una sola línea = texto normal.<br>
+            <b>Tipos de trabajo:</b> Melamina, Espejos, Decoración, Aluminio, Puertas de ducha, Barandas, etc.
           </div>
         </section>
 
-        <!-- PAGINA 2 -->
+        <!-- ===== PÁGINA 2 ===== -->
         <section class="section" id="tab-pagina2">
-          <label>Especificaciones técnicas detalladas (texto libre)</label>
+          <label>Especificaciones técnicas detalladas</label>
           <textarea id="in_detailSpecs" style="min-height:160px;"></textarea>
-          <div class="hint">Puedes escribir con 1) 2) 3) y bullets con “•” tal como tu ejemplo.</div>
+          <div class="hint">Usa 1) 2) 3) y bullets con "•".</div>
 
           <div class="row">
             <div class="left">
@@ -682,8 +833,8 @@
 
           <div class="cond-list" id="condsEditor"></div>
 
-          <label style="margin-top:14px;">Texto “Aceptación de la cotización”</label>
-          <textarea id="in_acceptText" style="min-height:90px;"></textarea>
+          <label style="margin-top:14px;">Texto "Aceptación de la cotización"</label>
+          <textarea id="in_acceptText" style="min-height:80px;"></textarea>
 
           <div class="grid2">
             <div>
@@ -707,52 +858,95 @@
             </div>
           </div>
         </section>
-      </div>
+
+        <!-- ===== DISEÑO ===== -->
+        <section class="section" id="tab-diseno">
+
+          <div class="section-title">Tema de color del documento</div>
+
+          <div class="theme-grid" id="themeGrid"></div>
+
+          <div style="margin-bottom:8px; font-size:12px; color:#cfe0f2;">Color personalizado</div>
+          <div class="custom-colors">
+            <div class="color-field">
+              <input type="color" id="in_colorMarron" value="#7d644c" />
+              <div>
+                <div style="font-size:12px;font-weight:700;">Color principal</div>
+                <div style="font-size:10px;color:#9fb0c0;">(topbar, títulos, bordes)</div>
+              </div>
+            </div>
+            <div class="color-field">
+              <input type="color" id="in_colorBeige" value="#e2d2b8" />
+              <div>
+                <div style="font-size:12px;font-weight:700;">Color secundario</div>
+                <div style="font-size:10px;color:#9fb0c0;">(encabezado tabla, acento)</div>
+              </div>
+            </div>
+            <button class="btn-secondary" id="btnApplyCustomColor" type="button" style="font-size:12px;padding:8px 12px;">Aplicar</button>
+          </div>
+
+          <div class="section-title">Fuente del documento</div>
+
+          <div class="font-grid" id="fontGrid"></div>
+
+          <div class="section-title" style="margin-top:14px;">Información</div>
+          <div class="hint">
+            Los cambios de diseño se aplican en tiempo real y se guardan con el botón <b>Guardar</b>.<br>
+            El nombre del PDF al imprimir se genera como: <b>Empresa - Cliente - N°Cotización.pdf</b>
+          </div>
+        </section>
+
+      </div><!-- editor__body -->
 
       <div class="btns">
-        <button class="btn-primary" id="btnSave" type="button">Guardar</button>
-        <button class="btn-ghost" id="btnReset" type="button">Reset</button>
-        <button class="btn-secondary" id="btnPDF" type="button">Descargar PDF</button>
+        <button class="btn-primary"   id="btnSave"  type="button">💾 Guardar</button>
+        <button class="btn-ghost"     id="btnReset" type="button">Reset</button>
+        <button class="btn-secondary" id="btnPDF"   type="button">📄 Descargar PDF</button>
       </div>
     </aside>
 
     <!-- PREVIEW -->
     <main class="preview-wrap">
       <div class="preview-meta">
-        <div>Vista previa A4 (2 páginas) • Listo para imprimir/Guardar como PDF</div>
+        <div>Vista previa A4 (2 páginas) • Listo para imprimir / Guardar como PDF</div>
         <div class="zoom">
           <span>Zoom</span>
-          <input id="zoomRange" type="range" min="0.72" max="1.20" step="0.02" value="0.92" />
+          <input id="zoomRange" type="range" min="0.55" max="1.20" step="0.02" value="0.92" />
           <span class="pill" id="zoomLabel">92%</span>
         </div>
       </div>
 
       <div class="doc" id="doc">
-        <!-- PAGE 1 -->
+
+        <!-- ====== PAGE 1 ====== -->
         <section class="page" aria-label="Página 1">
           <div class="page-inner">
+
+            <!-- Watermark Page 1 -->
+            <div class="watermark-p1" id="pv_watermarkP1Wrap" style="display:none;">
+              <img id="pv_watermarkP1Img" alt="watermark" />
+            </div>
 
             <div class="topbar">
               <div class="brand">
                 <div class="logo"><img id="pv_logo1" alt="logo" /></div>
                 <div class="brand-text">
-                  <div class="name" id="pv_companyName1">Dazoru Projects</div>
-                  <div class="sub" id="pv_companySub1">Decoración • Melamina • Espejos</div>
+                  <div class="name" id="pv_companyName1">Empresa</div>
+                  <div class="sub" id="pv_companySub1">Servicios</div>
                 </div>
               </div>
               <div class="topbar-right">
                 <div class="tag">Cotización | <span id="pv_quoteNoTop">DP-0001</span></div>
-                <div class="num">Fecha: <span id="pv_dateTop">2026-02-10</span></div>
+                <div class="num">Fecha: <span id="pv_dateTop">2026-01-01</span></div>
               </div>
             </div>
 
-            <div class="title" id="pv_title">HOJA DE COTIZACIÓN - PROYECTO: ...</div>
+            <div class="doctitle" id="pv_title">HOJA DE COTIZACIÓN</div>
             <div class="subtitle">Propuesta económica y técnica para ejecución del proyecto</div>
 
             <div class="two-col">
               <div class="box">
                 <h3>Datos del Cliente</h3>
-
                 <div class="kv-client">
                   <div class="k">Cliente</div><div class="v" id="pv_client">—</div>
                   <div class="k">Proyecto</div><div class="v" id="pv_project">—</div>
@@ -760,13 +954,12 @@
                   <div class="k">Fecha</div><div class="v" id="pv_date">—</div>
                 </div>
               </div>
-
               <div class="box">
                 <h3>Datos de la Empresa</h3>
                 <div class="kv">
-                  <div class="k">Empresa</div><div class="v" id="pv_companyName2">Dazoru Projects</div>
-                  <div class="k">RUC</div><div class="v" id="pv_ruc">00000000000</div>
-                  <div class="k">Dirección</div><div class="v" id="pv_address">Lima, Perú</div>
+                  <div class="k">Empresa</div><div class="v" id="pv_companyName2">—</div>
+                  <div class="k">RUC</div><div class="v" id="pv_ruc">—</div>
+                  <div class="k">Dirección</div><div class="v" id="pv_address">—</div>
                   <div class="k">Número</div><div class="v" id="pv_phoneLine">—</div>
                   <div class="k">Correo</div><div class="v" id="pv_emailLine">—</div>
                 </div>
@@ -783,7 +976,7 @@
                 <thead>
                   <tr>
                     <th style="width:13%;">Ambiente</th>
-                    <th style="width:18%;">Producto</th>
+                    <th style="width:18%;">Producto / Trabajo</th>
                     <th style="width:34%;">Especificaciones</th>
                     <th style="width:23%;">Detalle</th>
                     <th style="width:12%; text-align:right;">Precio</th>
@@ -795,15 +988,15 @@
 
             <div class="totals">
               <div class="totals-card">
-                <div class="row">
+                <div class="trow">
                   <div class="k">Subtotal</div>
                   <div class="v" id="pv_subtotal">S/ 0.00</div>
                 </div>
-                <div class="row" id="pv_discountRow" style="display:none;">
+                <div class="trow" id="pv_discountRow" style="display:none;">
                   <div class="k">Descuento</div>
                   <div class="v" id="pv_discount">- S/ 0.00</div>
                 </div>
-                <div class="row grand">
+                <div class="trow grand">
                   <div class="k">TOTAL</div>
                   <div class="v" id="pv_total">S/ 0.00</div>
                 </div>
@@ -811,7 +1004,7 @@
             </div>
 
             <div class="footer">
-              <div class="left">
+              <div class="fleft">
                 <span class="foot-pill"><span class="dot"></span><b>Contacto</b>: <span id="pv_footerContact">—</span></span>
                 <span class="foot-pill"><span class="dot"></span><b>WhatsApp</b>: <span id="pv_footerWsp">—</span></span>
                 <span class="foot-pill" id="pv_footerRucWrap">
@@ -820,10 +1013,10 @@
               </div>
             </div>
 
-          </div>
+          </div><!-- page-inner -->
         </section>
 
-        <!-- PAGE 2 -->
+        <!-- ====== PAGE 2 ====== -->
         <section class="page" aria-label="Página 2">
           <div class="page-inner" style="gap:8px;">
 
@@ -831,19 +1024,17 @@
               <div class="brand">
                 <div class="logo"><img id="pv_logo2" alt="logo" /></div>
                 <div class="brand-text">
-                  <div class="name" id="pv_companyName3">DAZORU PROJECTS</div>
-                  <div class="sub" id="pv_companySub2">Decoración • Melamina • Espejos</div>
+                  <div class="name" id="pv_companyName3">EMPRESA</div>
+                  <div class="sub" id="pv_companySub2">Servicios</div>
                 </div>
               </div>
-
-              <!-- ✅ Igual que Página 1 -->
               <div class="topbar-right">
                 <div class="tag">Cotización | <span id="pv_quoteNoTop2">DP-0001</span></div>
-                <div class="num">Fecha: <span id="pv_dateTop2">2026-02-10</span></div>
+                <div class="num">Fecha: <span id="pv_dateTop2">2026-01-01</span></div>
               </div>
             </div>
 
-            <!-- watermark -->
+            <!-- Watermark Page 2 -->
             <div class="watermark" id="pv_watermarkWrap" style="display:none;">
               <img id="pv_watermarkImg" alt="watermark" />
             </div>
@@ -872,8 +1063,8 @@
                 <table class="sign2-table">
                   <tbody>
                     <tr>
-                      <td style="width:50%;">Cliente (firma): <span class="line"></span></td>
-                      <td style="width:50%;">Dazoru Projects (firma): <span class="line"></span></td>
+                      <td style="width:50%;">Cliente (firma): <span class="sline"></span></td>
+                      <td style="width:50%;"><span id="pv_signCompanyLabel">Empresa</span> (firma): <span class="sline"></span></td>
                     </tr>
                     <tr>
                       <td>DNI: <span id="pv_dni">__________</span></td>
@@ -885,7 +1076,7 @@
             </div>
 
             <div class="footer">
-              <div class="left">
+              <div class="fleft">
                 <span class="foot-pill"><span class="dot"></span><b>Contacto</b>: <span id="pv_footerContact2">—</span></span>
                 <span class="foot-pill"><span class="dot"></span><b>WhatsApp</b>: <span id="pv_footerWsp2">—</span></span>
                 <span class="foot-pill" id="pv_footerRucWrap2">
@@ -896,708 +1087,668 @@
 
           </div>
         </section>
-      </div>
+
+      </div><!-- doc -->
     </main>
 
-  </div>
+  </div><!-- app -->
 
   <script>
-    (function(){
-      "use strict";
+  (function(){
+    "use strict";
 
-      // ===== PWA register =====
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker.register("./sw.js").catch(()=>{});
-        });
-      }
-
-      const STORAGE_KEY = "dazoru_proforma_v3";
-      const $ = (id)=>document.getElementById(id);
-
-      const el = {
-        // empresa
-        companyName: $("in_companyName"),
-        ruc: $("in_ruc"),
-        address: $("in_address"),
-        whatsapp: $("in_whatsapp"),
-        phone: $("in_phone"),
-        email: $("in_email"),
-        logo: $("in_logo"),
-        showRucFooter: $("in_showRucFooter"),
-        showWatermark: $("in_showWatermark"),
-
-        // cotizacion
-        titleOverride: $("in_titleOverride"),
-        quoteNo: $("in_quoteNo"),
-        date: $("in_date"),
-        client: $("in_client"),
-        project: $("in_project"),
-        summary: $("in_summary"),
-        discType: $("in_discType"),
-        discValue: $("in_discValue"),
-
-        // page2 inputs
-        detailSpecs: $("in_detailSpecs"),
-        acceptText: $("in_acceptText"),
-        signClient: $("in_signClient"),
-        signCompany: $("in_signCompany"),
-        dni: $("in_dni"),
-        signDate: $("in_signDate"),
-
-        // editors
-        itemsEditor: $("itemsEditor"),
-        condsEditor: $("condsEditor"),
-        itemsCount: $("itemsCount"),
-        condsCount: $("condsCount"),
-
-        // btns
-        btnAddItem: $("btnAddItem"),
-        btnAddCond: $("btnAddCond"),
-        btnSave: $("btnSave"),
-        btnReset: $("btnReset"),
-        btnPDF: $("btnPDF"),
-
-        // preview page1
-        pv_logo1: $("pv_logo1"),
-        pv_logo2: $("pv_logo2"),
-        pv_companyName1: $("pv_companyName1"),
-        pv_companySub1: $("pv_companySub1"),
-        pv_companyName2: $("pv_companyName2"),
-        pv_companyName3: $("pv_companyName3"),
-        pv_companySub2: $("pv_companySub2"),
-        pv_quoteNoTop: $("pv_quoteNoTop"),
-        pv_dateTop: $("pv_dateTop"),
-
-        // ✅ page2 top right same as page1
-        pv_quoteNoTop2: $("pv_quoteNoTop2"),
-        pv_dateTop2: $("pv_dateTop2"),
-
-        pv_title: $("pv_title"),
-        pv_client: $("pv_client"),
-        pv_project: $("pv_project"),
-        pv_quoteNo: $("pv_quoteNo"),
-        pv_date: $("pv_date"),
-        pv_ruc: $("pv_ruc"),
-        pv_address: $("pv_address"),
-
-        // ✅ empresa: numero y correo separados
-        pv_phoneLine: $("pv_phoneLine"),
-        pv_emailLine: $("pv_emailLine"),
-
-        pv_summary: $("pv_summary"),
-        pv_itemsBody: $("pv_itemsBody"),
-        pv_subtotal: $("pv_subtotal"),
-        pv_discountRow: $("pv_discountRow"),
-        pv_discount: $("pv_discount"),
-        pv_total: $("pv_total"),
-        pv_footerContact: $("pv_footerContact"),
-        pv_footerWsp: $("pv_footerWsp"),
-        pv_footerRuc: $("pv_footerRuc"),
-        pv_footerRucWrap: $("pv_footerRucWrap"),
-
-        // preview page2
-        pv_detailSpecs: $("pv_detailSpecs"),
-        pv_condsBody: $("pv_condsBody"),
-        pv_acceptText: $("pv_acceptText"),
-        pv_dni: $("pv_dni"),
-        pv_signDate: $("pv_signDate"),
-        pv_footerContact2: $("pv_footerContact2"),
-        pv_footerWsp2: $("pv_footerWsp2"),
-        pv_footerRuc2: $("pv_footerRuc2"),
-        pv_footerRucWrap2: $("pv_footerRucWrap2"),
-
-        // watermark
-        pv_watermarkWrap: $("pv_watermarkWrap"),
-        pv_watermarkImg: $("pv_watermarkImg"),
-
-        // UI
-        statusPill: $("statusPill"),
-        zoomRange: $("zoomRange"),
-        zoomLabel: $("zoomLabel"),
-      };
-
-      function todayISO(){
-        const d = new Date();
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth()+1).padStart(2,"0");
-        const dd = String(d.getDate()).padStart(2,"0");
-        return `${yyyy}-${mm}-${dd}`;
-      }
-
-      function cryptoId(){
-        try{
-          const a = new Uint32Array(2);
-          crypto.getRandomValues(a);
-          return (a[0].toString(16)+a[1].toString(16));
-        }catch(e){
-          return String(Date.now()) + "_" + Math.random().toString(16).slice(2);
-        }
-      }
-
-      function deepClone(obj){ return JSON.parse(JSON.stringify(obj)); }
-      function safeText(s){ return (s===null || s===undefined) ? "" : String(s); }
-
-      function escapeHtml(str){
-        return String(str ?? "")
-          .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-          .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-      }
-      function escapeAttr(str){ return escapeHtml(str).replace(/"/g,"&quot;"); }
-
-      function money(n){
-        const v = Number.isFinite(n) ? n : 0;
-        return "S/ " + v.toFixed(2);
-      }
-
-      function setStatus(text, kind="ok"){
-        el.statusPill.textContent = text;
-        el.statusPill.style.borderColor = kind==="danger" ? "rgba(255,91,91,.45)" : "rgba(53,196,122,.35)";
-        el.statusPill.style.background = kind==="danger" ? "rgba(255,91,91,.18)" : "rgba(53,196,122,.14)";
-      }
-
-      function makePlaceholderLogo(name){
-        const initials = (safeText(name).trim().split(/\s+/).slice(0,2).map(w=>w[0]?.toUpperCase()||"").join("") || "DP").slice(0,2);
-        const svg =
-`<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#e2d2b8"/>
-      <stop offset="1" stop-color="#7d644c"/>
-    </linearGradient>
-  </defs>
-  <rect rx="18" ry="18" x="0" y="0" width="120" height="120" fill="url(#g)"/>
-  <text x="60" y="74" font-family="Arial, sans-serif" font-size="44" font-weight="900" text-anchor="middle" fill="#1f140c">${initials}</text>
-</svg>`;
-        return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-      }
-
-      const DEFAULTS = {
-        company: {
-          name: "Dazoru Projects",
-          sub: "Decoración • Melamina • Espejos",
-          ruc: "00000000000",
-          address: "Lima, Perú",
-          whatsapp: "+51 999 999 999",
-          phone: "+51 999 999 999",
-          email: "ventas@dazoru.pe",
-          logoDataUrl: "",
-          showRucFooter: true,
-          showWatermark: true
-        },
-        quote: {
-          titleOverride: "HOJA DE COTIZACIÓN - PROYECTO: MUEBLE DE BAÑO MODERNO (MIRAFLORES)",
-          no: "DP-0001",
-          date: todayISO(),
-          client: "Sr(a). Cliente",
-          project: "Mueble de baño moderno (Miraflores)",
-          summary:
-`Presentamos la propuesta para la fabricación e instalación del mueble de baño.
-Incluye materiales, mano de obra, instalación y acabados según especificaciones.
-Los precios están expresados en Soles (PEN).`,
-          discType: "PEN",
-          discValue: 0
-        },
-        items: [
-          {
-            id: cryptoId(),
-            include: true,
-            ambiente: "Baño",
-            producto: "Mueble bajo lavatorio",
-            descripcion: "Melamina 18mm + lavatorio (según modelo)",
-            especificaciones: "Melamina 18mm\nCantos PVC\nBisagras cierre suave\nHerrajes A1",
-            precio: 850
-          },
-          {
-            id: cryptoId(),
-            include: true,
-            ambiente: "Baño",
-            producto: "Espejo decorativo LED",
-            descripcion: "Espejo con iluminación cálida",
-            especificaciones: "Biselado perimetral\nTira LED 12V\nInterruptor táctil",
-            precio: 520
-          }
-        ],
-        page2: {
-          detailSpecs:
-`1) Melamina RH (Resistente a Humedad)
-• Tablero melamínico Pelíkano de 18 mm para ambientes húmedos.
-• Cantos sellados con cinta PVC para proteger bordes y prolongar la vida útil.
-• Ensamble con tornillería adecuada y refuerzos donde aplique.
-
-2) Espejo Optimirror 3 mm
-• Espesor: 3 mm.
-• Instalación recomendada sobre superficie nivelada con adhesivo compatible (silicona neutra).
-• Opcional según diseño: canto pulido / biselado.
-
-3) Herrajes y accesorios (según modelo)
-• Puertas: bisagras tipo cazoleta 35 mm (apertura suave según disponibilidad).
-• Mueble sobre inodoro: sistema hidráulico para apertura controlada.
-• Mueble flotante: fijación con anclajes según tipo de muro (ladrillo, concreto, drywall).
-
-4) Iluminación LED (solo en el modelo con LED)
-• Tira LED 12V (o equivalente) instalada de forma discreta.
-• Tono a elección: cálida / neutra / fría (a coordinar).
-• Incluye fuente de poder y conexión básica (requiere punto de energía en el ambiente).`,
-          conditions: [
-            { id: cryptoId(), concepto:"Validez de la cotización", detalle:"10 días calendario desde la fecha de emisión." },
-            { id: cryptoId(), concepto:"Plazo de entrega", detalle:"A coordinar según medidas finales, color y disponibilidad de materiales." },
-            { id: cryptoId(), concepto:"Forma de pago", detalle:"A coordinar (ej.: 50% adelanto / 50% contra entrega)." },
-            { id: cryptoId(), concepto:"Personalización", detalle:"Medidas, distribución interna y color de melamina se confirman antes de fabricar." },
-            { id: cryptoId(), concepto:"Transporte e instalación", detalle:"Se cotiza según ubicación y tipo de muro (drywall, ladrillo, concreto, etc.)." },
-            { id: cryptoId(), concepto:"Garantía", detalle:"Garantía por fabricación. No cubre daños por mal uso, filtraciones de agua o trabajos de terceros." },
-            { id: cryptoId(), concepto:"Cuidado y mantenimiento", detalle:"Limpiar con paño suave. Evitar químicos abrasivos y exceso de agua en cantos." }
-          ],
-          acceptText:
-"Con la aceptación del cliente se confirma: diseño final, medidas, color de melamina y condiciones de entrega/instalación.",
-          dni: "__________",
-          signDate: "__/__/20__",
-          signClient: "",
-          signCompany: ""
-        }
-      };
-
-      let state = deepClone(DEFAULTS);
-
-      const tabButtons = Array.from(document.querySelectorAll(".tab"));
-      tabButtons.forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const key = btn.getAttribute("data-tab");
-          tabButtons.forEach(b=>b.setAttribute("aria-selected","false"));
-          btn.setAttribute("aria-selected","true");
-          document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"));
-          const target = document.getElementById("tab-"+key);
-          if (target) target.classList.add("active");
-        });
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", ()=>{
+        navigator.serviceWorker.register("./sw.js").catch(()=>{});
       });
+    }
 
-      function renderSpecCell(text){
-        const raw = safeText(text).replace(/\r\n/g,"\n").trim();
-        if (!raw) return '<span class="muted">—</span>';
-        const lines = raw.split("\n").map(s=>s.trim()).filter(Boolean);
-        if (lines.length >= 2){
-          const li = lines.map(x=>`<li>${escapeHtml(x)}</li>`).join("");
-          return `<ul class="spec-ul">${li}</ul>`;
-        }
-        return `<p class="spec-p">${escapeHtml(raw)}</p>`;
-      }
+    const STORAGE_KEY = "dazoru_proforma_v4";
+    const $ = id => document.getElementById(id);
 
-      function computeTotals(){
-        const subtotal = state.items.filter(i=>i.include).reduce((acc,i)=>acc + (parseFloat(i.precio)||0), 0);
-        const discValue = parseFloat(state.quote.discValue)||0;
-        let discountAmount = 0;
-        if (discValue > 0){
-          discountAmount = (state.quote.discType === "PCT")
-            ? subtotal * (discValue/100)
-            : discValue;
-        }
-        discountAmount = Math.min(discountAmount, subtotal);
-        return { subtotal, discountAmount, total: subtotal - discountAmount };
-      }
+    /* =========================================================
+       TEMAS DE COLOR
+    ========================================================= */
+    const THEMES = [
+      { id:"marron",  name:"Marrón clásico",   marron:"#7d644c", beige:"#e2d2b8" },
+      { id:"azul",    name:"Azul corporativo",  marron:"#1e4d8c", beige:"#cfe0f7" },
+      { id:"verde",   name:"Verde esmeralda",   marron:"#1a6644", beige:"#c8ead8" },
+      { id:"gris",    name:"Gris antracita",    marron:"#374151", beige:"#e5e7eb" },
+      { id:"borgona", name:"Borgoña",           marron:"#7c2d3e", beige:"#fce0e5" },
+      { id:"negro",   name:"Negro elegante",    marron:"#1a1a1a", beige:"#e8e8e8" },
+      { id:"terrac",  name:"Terracota",         marron:"#9e4c2e", beige:"#fae0d5" },
+      { id:"oceano",  name:"Océano",            marron:"#0e6b8c", beige:"#cdf0fa" },
+      { id:"oliva",   name:"Oliva natural",     marron:"#5a6a2e", beige:"#e2ebcc" },
+    ];
 
-      function renderItemsEditor(){
-        el.itemsEditor.innerHTML = "";
-        el.itemsCount.textContent = `${state.items.length} ítems`;
+    /* =========================================================
+       FUENTES
+    ========================================================= */
+    const FONTS = [
+      { id:"system",    name:"Sistema (por defecto)",  value:"system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif", sample:"Cotización profesional" },
+      { id:"montserrat",name:"Montserrat",             value:"'Montserrat', Arial, sans-serif",                               sample:"Cotización profesional" },
+      { id:"playfair",  name:"Playfair Display",       value:"'Playfair Display', Georgia, serif",                            sample:"Cotización profesional" },
+      { id:"lato",      name:"Lato",                   value:"'Lato', Arial, sans-serif",                                    sample:"Cotización profesional" },
+      { id:"raleway",   name:"Raleway",                value:"'Raleway', Arial, sans-serif",                                  sample:"Cotización profesional" },
+      { id:"poppins",   name:"Poppins",                value:"'Poppins', Arial, sans-serif",                                  sample:"Cotización profesional" },
+      { id:"georgia",   name:"Georgia (Serif clásico)",value:"Georgia, 'Times New Roman', serif",                             sample:"Cotización profesional" },
+      { id:"courier",   name:"Courier (Mono)",         value:"'Courier New', Courier, monospace",                            sample:"Cotización profesional" },
+    ];
 
-        state.items.forEach((it, idx)=>{
-          const wrap = document.createElement("div");
-          wrap.className = "item";
-          wrap.innerHTML = `
-            <div class="item__head">
-              <div class="title">
-                <strong>Ítem ${idx+1}</strong>
-                <label class="check">
-                  <input type="checkbox" data-act="include" ${it.include ? "checked":""} />
-                  Incluir
-                </label>
-              </div>
-              <div class="actions">
-                <button class="mini-btn del" data-act="delete" type="button">Eliminar</button>
-              </div>
-            </div>
+    /* =========================================================
+       UTILIDADES
+    ========================================================= */
+    function todayISO(){
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    }
+    function cryptoId(){
+      try{
+        const a = new Uint32Array(2);
+        crypto.getRandomValues(a);
+        return a[0].toString(16)+a[1].toString(16);
+      }catch(e){ return String(Date.now())+"_"+Math.random().toString(16).slice(2); }
+    }
+    function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+    function safeText(s){ return (s===null||s===undefined) ? "" : String(s); }
+    function escapeHtml(s){
+      return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+    function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
+    function money(n){ return "S/ " + (Number.isFinite(n)?n:0).toFixed(2); }
+    function setStatus(text, kind="ok"){
+      const p = $("statusPill");
+      p.textContent = text;
+      p.style.borderColor = kind==="danger" ? "rgba(255,91,91,.45)" : "rgba(53,196,122,.35)";
+      p.style.background  = kind==="danger" ? "rgba(255,91,91,.18)" : "rgba(53,196,122,.14)";
+    }
+    function makePlaceholderLogo(name){
+      const initials = (safeText(name).trim().split(/\s+/).slice(0,2).map(w=>w[0]?.toUpperCase()||"").join("")||"DP").slice(0,2);
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2d2b8"/><stop offset="1" stop-color="#7d644c"/></linearGradient></defs><rect rx="18" ry="18" x="0" y="0" width="120" height="120" fill="url(#g)"/><text x="60" y="74" font-family="Arial,sans-serif" font-size="44" font-weight="900" text-anchor="middle" fill="#1f140c">${initials}</text></svg>`;
+      return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+    }
 
-            <div class="grid2">
-              <div>
-                <label>Ambiente</label>
-                <input type="text" data-act="ambiente" value="${escapeAttr(it.ambiente)}" />
-              </div>
-              <div>
-                <label>Producto</label>
-                <input type="text" data-act="producto" value="${escapeAttr(it.producto)}" />
-              </div>
-            </div>
+    /* =========================================================
+       DEFAULTS
+    ========================================================= */
+    const DEFAULTS = {
+      company:{
+        name:"Dazoru Projects",
+        sub:"Decoración • Melamina • Espejos",
+        ruc:"00000000000",
+        address:"Lima, Perú",
+        whatsapp:"+51 999 999 999",
+        phone:"+51 999 999 999",
+        email:"ventas@dazoru.pe",
+        logoDataUrl:"",
+        showRucFooter:true,
+        showWatermark:true,
+        showWatermarkP1:false,
+      },
+      quote:{
+        titleOverride:"",
+        no:"DP-0001",
+        date:todayISO(),
+        client:"Sr(a). Cliente",
+        project:"Mueble de baño moderno (Miraflores)",
+        summary:"Presentamos la propuesta para la fabricación e instalación del mueble de baño.\nIncluye materiales, mano de obra, instalación y acabados según especificaciones.\nLos precios están expresados en Soles (PEN).",
+        discType:"PEN",
+        discValue:0,
+      },
+      items:[
+        { id:cryptoId(), include:true, ambiente:"Baño", producto:"Mueble bajo lavatorio", descripcion:"Melamina 18mm + lavatorio", especificaciones:"Melamina 18mm\nCantos PVC\nBisagras cierre suave\nHerrajes A1", precio:850 },
+        { id:cryptoId(), include:true, ambiente:"Baño", producto:"Espejo decorativo LED",  descripcion:"Espejo con iluminación cálida", especificaciones:"Biselado perimetral\nTira LED 12V\nInterruptor táctil", precio:520 },
+      ],
+      page2:{
+        detailSpecs:`1) Melamina RH (Resistente a Humedad)\n• Tablero melamínico de 18 mm para ambientes húmedos.\n• Cantos sellados con cinta PVC.\n• Ensamble con tornillería adecuada.\n\n2) Espejo Optimirror 3 mm\n• Espesor: 3 mm.\n• Instalación con adhesivo compatible (silicona neutra).\n\n3) Herrajes y accesorios\n• Bisagras tipo cazoleta 35 mm.\n• Fijación con anclajes según tipo de muro.\n\n4) Iluminación LED (solo en modelo con LED)\n• Tira LED 12V instalada de forma discreta.\n• Incluye fuente de poder y conexión básica.`,
+        conditions:[
+          { id:cryptoId(), concepto:"Validez",          detalle:"10 días calendario desde la fecha de emisión." },
+          { id:cryptoId(), concepto:"Plazo de entrega",  detalle:"A coordinar según medidas finales y disponibilidad." },
+          { id:cryptoId(), concepto:"Forma de pago",     detalle:"50% adelanto / 50% contra entrega." },
+          { id:cryptoId(), concepto:"Personalización",   detalle:"Medidas, distribución y color de melamina se confirman antes de fabricar." },
+          { id:cryptoId(), concepto:"Transporte/Install",detalle:"Se cotiza según ubicación y tipo de muro." },
+          { id:cryptoId(), concepto:"Garantía",          detalle:"Garantía por fabricación. No cubre daños por mal uso o filtraciones." },
+          { id:cryptoId(), concepto:"Mantenimiento",     detalle:"Limpiar con paño suave. Evitar químicos abrasivos." },
+        ],
+        acceptText:"Con la aceptación del cliente se confirma: diseño final, medidas, color de melamina y condiciones de entrega.",
+        dni:"__________",
+        signDate:"__/__/20__",
+        signClient:"",
+        signCompany:"",
+      },
+      design:{
+        themeId:"marron",
+        marron:"#7d644c",
+        beige:"#e2d2b8",
+        fontId:"system",
+      },
+    };
 
-            <div class="grid2">
-              <div>
-                <label>Descripción (opcional)</label>
-                <input type="text" data-act="descripcion" value="${escapeAttr(it.descripcion)}" />
-              </div>
-              <div>
-                <label>Precio (S/)</label>
-                <input type="number" min="0" step="0.01" data-act="precio" value="${escapeAttr(it.precio)}" />
-              </div>
-            </div>
+    let state = deepClone(DEFAULTS);
 
-            <label>Especificaciones (una por línea = bullets)</label>
-            <textarea data-act="especificaciones">${escapeHtml(it.especificaciones)}</textarea>
-          `;
+    /* =========================================================
+       TABS
+    ========================================================= */
+    const tabBtns = Array.from(document.querySelectorAll(".tab"));
+    tabBtns.forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const key = btn.getAttribute("data-tab");
+        tabBtns.forEach(b=>b.setAttribute("aria-selected","false"));
+        btn.setAttribute("aria-selected","true");
+        document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+        const t = document.getElementById("tab-"+key);
+        if(t) t.classList.add("active");
+      });
+    });
 
-          wrap.addEventListener("input", (e)=>{
-            const t = e.target;
-            const act = t?.getAttribute?.("data-act");
-            if (!act) return;
-            if (act==="ambiente") it.ambiente = t.value;
-            if (act==="producto") it.producto = t.value;
-            if (act==="descripcion") it.descripcion = t.value;
-            if (act==="precio") it.precio = parseFloat(t.value || "0") || 0;
-            if (act==="especificaciones") it.especificaciones = t.value;
-            renderPreview();
-            setStatus("Cambios sin guardar","danger");
-          });
+    /* =========================================================
+       TEMA: aplicar CSS variables al :root
+    ========================================================= */
+    function applyDesign(){
+      const d = state.design;
+      document.documentElement.style.setProperty("--marron", d.marron);
+      document.documentElement.style.setProperty("--beige",  d.beige);
+      const fontObj = FONTS.find(f=>f.id===d.fontId) || FONTS[0];
+      document.documentElement.style.setProperty("--doc-font", fontObj.value);
+    }
 
-          wrap.addEventListener("change", (e)=>{
-            const t = e.target;
-            const act = t?.getAttribute?.("data-act");
-            if (act==="include"){
-              it.include = !!t.checked;
-              renderPreview();
-              setStatus("Cambios sin guardar","danger");
-            }
-          });
-
-          wrap.addEventListener("click", (e)=>{
-            const t = e.target;
-            const act = t?.getAttribute?.("data-act");
-            if (act==="delete"){
-              state.items = state.items.filter(x=>x.id!==it.id);
-              renderItemsEditor();
-              renderPreview();
-              setStatus("Cambios sin guardar","danger");
-            }
-          });
-
-          el.itemsEditor.appendChild(wrap);
+    /* =========================================================
+       RENDER: Tema grid
+    ========================================================= */
+    function renderThemeGrid(){
+      const grid = $("themeGrid");
+      grid.innerHTML = "";
+      THEMES.forEach(theme=>{
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "theme-btn" + (state.design.themeId===theme.id ? " active" : "");
+        btn.innerHTML = `
+          <div class="theme-swatch">
+            <div class="swatch-top" style="background:${theme.marron}"></div>
+            <div class="swatch-bot" style="background:${theme.beige}"></div>
+          </div>
+          <div class="theme-name">${theme.name}</div>
+        `;
+        btn.addEventListener("click", ()=>{
+          state.design.themeId = theme.id;
+          state.design.marron  = theme.marron;
+          state.design.beige   = theme.beige;
+          $("in_colorMarron").value = theme.marron;
+          $("in_colorBeige").value  = theme.beige;
+          applyDesign();
+          renderThemeGrid();
+          setStatus("Cambios sin guardar","danger");
         });
-      }
+        grid.appendChild(btn);
+      });
+    }
 
-      function renderCondsEditor(){
-        el.condsEditor.innerHTML = "";
-        el.condsCount.textContent = `${state.page2.conditions.length} condiciones`;
+    /* =========================================================
+       RENDER: Fuente grid
+    ========================================================= */
+    function renderFontGrid(){
+      const grid = $("fontGrid");
+      grid.innerHTML = "";
+      FONTS.forEach(font=>{
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "font-btn" + (state.design.fontId===font.id ? " active" : "");
+        btn.innerHTML = `
+          <div class="fname" style="font-family:${font.value}">${font.name}</div>
+          <div class="fsample" style="font-family:${font.value}">${font.sample}</div>
+        `;
+        btn.addEventListener("click", ()=>{
+          state.design.fontId = font.id;
+          applyDesign();
+          renderFontGrid();
+          setStatus("Cambios sin guardar","danger");
+        });
+        grid.appendChild(btn);
+      });
+    }
 
-        state.page2.conditions.forEach((c, idx)=>{
-          const wrap = document.createElement("div");
-          wrap.className = "cond";
-          wrap.innerHTML = `
-            <div class="cond__head">
-              <strong>Condición ${idx+1}</strong>
+    /* =========================================================
+       RENDER: Items editor
+    ========================================================= */
+    function renderItemsEditor(){
+      const ed = $("itemsEditor");
+      ed.innerHTML = "";
+      $("itemsCount").textContent = `${state.items.length} ítems`;
+
+      state.items.forEach((it, idx)=>{
+        const wrap = document.createElement("div");
+        wrap.className = "item";
+        wrap.innerHTML = `
+          <div class="item__head">
+            <div class="ititle">
+              <strong>Ítem ${idx+1}</strong>
+              <label class="check">
+                <input type="checkbox" data-act="include" ${it.include?"checked":""} />
+                Incluir
+              </label>
+            </div>
+            <div class="actions">
               <button class="mini-btn del" data-act="delete" type="button">Eliminar</button>
             </div>
-            <div class="grid2">
-              <div>
-                <label>Concepto</label>
-                <input type="text" data-act="concepto" value="${escapeAttr(c.concepto)}" />
-              </div>
-              <div>
-                <label>Detalle</label>
-                <input type="text" data-act="detalle" value="${escapeAttr(c.detalle)}" />
-              </div>
+          </div>
+          <div class="grid2">
+            <div>
+              <label>Tipo / Ambiente</label>
+              <input type="text" data-act="ambiente" value="${escapeAttr(it.ambiente)}" placeholder="Baño, Ducha, Cocina, Escalera…" />
             </div>
-          `;
-
-          wrap.addEventListener("input", (e)=>{
-            const t = e.target;
-            const act = t?.getAttribute?.("data-act");
-            if (!act) return;
-            if (act==="concepto") c.concepto = t.value;
-            if (act==="detalle") c.detalle = t.value;
-            renderPreview();
-            setStatus("Cambios sin guardar","danger");
-          });
-
-          wrap.addEventListener("click", (e)=>{
-            const t = e.target;
-            const act = t?.getAttribute?.("data-act");
-            if (act==="delete"){
-              state.page2.conditions = state.page2.conditions.filter(x=>x.id!==c.id);
-              renderCondsEditor();
-              renderPreview();
-              setStatus("Cambios sin guardar","danger");
-            }
-          });
-
-          el.condsEditor.appendChild(wrap);
-        });
-      }
-
-      function renderPreview(){
-        const c = state.company;
-        const q = state.quote;
-        const p2 = state.page2;
-
-        const logo = c.logoDataUrl || "";
-        const logoToUse = logo ? logo : makePlaceholderLogo(c.name);
-
-        el.pv_logo1.src = logoToUse;
-        el.pv_logo2.src = logoToUse;
-
-        el.pv_companyName1.textContent = safeText(c.name);
-        el.pv_companyName2.textContent = safeText(c.name);
-        el.pv_companyName3.textContent = safeText(c.name).toUpperCase();
-        el.pv_companySub1.textContent = safeText(c.sub);
-        el.pv_companySub2.textContent = safeText(c.sub);
-
-        el.pv_quoteNoTop.textContent = safeText(q.no);
-        el.pv_dateTop.textContent = safeText(q.date);
-
-        // ✅ page2 top right igual
-        el.pv_quoteNoTop2.textContent = safeText(q.no);
-        el.pv_dateTop2.textContent = safeText(q.date);
-
-        const autoTitle = `HOJA DE COTIZACIÓN - PROYECTO: ${(safeText(q.project).trim() || "—").toUpperCase()}`;
-        const title = safeText(q.titleOverride).trim() ? safeText(q.titleOverride).trim() : autoTitle;
-        el.pv_title.textContent = title;
-
-        el.pv_client.textContent = safeText(q.client);
-        el.pv_project.textContent = safeText(q.project);
-        el.pv_quoteNo.textContent = safeText(q.no);
-        el.pv_date.textContent = safeText(q.date);
-
-        el.pv_ruc.textContent = safeText(c.ruc);
-        el.pv_address.textContent = safeText(c.address);
-
-        // ✅ Empresa separado
-        const numero = [safeText(c.whatsapp).trim(), safeText(c.phone).trim()].filter(Boolean).join(" / ");
-        el.pv_phoneLine.textContent = numero || "—";
-        el.pv_emailLine.textContent = safeText(c.email).trim() || "—";
-
-        el.pv_summary.textContent = safeText(q.summary);
-
-        const rows = state.items
-          .filter(i=>i.include)
-          .map(i=>{
-            const desc = safeText(i.descripcion).trim();
-            const detalle = desc ? `${escapeHtml(desc)}` : `<span class="muted">—</span>`;
-            return `
-              <tr>
-                <td>${escapeHtml(safeText(i.ambiente))}</td>
-                <td><b>${escapeHtml(safeText(i.producto))}</b></td>
-                <td>${renderSpecCell(i.especificaciones)}</td>
-                <td>${detalle}</td>
-                <td class="price">${money(parseFloat(i.precio)||0)}</td>
-              </tr>
-            `;
-          }).join("");
-
-        el.pv_itemsBody.innerHTML = rows || `
-          <tr><td colspan="5" class="muted">No hay ítems incluidos. Activa “Incluir” en al menos un ítem.</td></tr>
+            <div>
+              <label>Producto / Trabajo</label>
+              <input type="text" data-act="producto" value="${escapeAttr(it.producto)}" placeholder="Mueble melamina, Baranda acero, Puerta ducha…" />
+            </div>
+          </div>
+          <div class="grid2">
+            <div>
+              <label>Descripción (opcional)</label>
+              <input type="text" data-act="descripcion" value="${escapeAttr(it.descripcion)}" />
+            </div>
+            <div>
+              <label>Precio (S/)</label>
+              <input type="number" min="0" step="0.01" data-act="precio" value="${escapeAttr(it.precio)}" />
+            </div>
+          </div>
+          <label>Especificaciones (una por línea = bullets)</label>
+          <textarea data-act="especificaciones">${escapeHtml(it.especificaciones)}</textarea>
         `;
 
-        const { subtotal, discountAmount, total } = computeTotals();
-        el.pv_subtotal.textContent = money(subtotal);
-        el.pv_total.textContent = money(total);
-
-        if (discountAmount > 0.00001){
-          el.pv_discountRow.style.display = "flex";
-          if (q.discType==="PCT"){
-            el.pv_discount.textContent = `- ${money(discountAmount)} (${(parseFloat(q.discValue)||0).toFixed(2)}%)`;
-          }else{
-            el.pv_discount.textContent = `- ${money(discountAmount)}`;
+        wrap.addEventListener("input", e=>{
+          const act = e.target?.getAttribute?.("data-act");
+          if(!act) return;
+          if(act==="ambiente")        it.ambiente        = e.target.value;
+          if(act==="producto")        it.producto        = e.target.value;
+          if(act==="descripcion")     it.descripcion     = e.target.value;
+          if(act==="precio")          it.precio          = parseFloat(e.target.value||"0")||0;
+          if(act==="especificaciones")it.especificaciones= e.target.value;
+          renderPreview(); setStatus("Cambios sin guardar","danger");
+        });
+        wrap.addEventListener("change", e=>{
+          if(e.target?.getAttribute?.("data-act")==="include"){
+            it.include = !!e.target.checked;
+            renderPreview(); setStatus("Cambios sin guardar","danger");
           }
-        }else{
-          el.pv_discountRow.style.display = "none";
-        }
-
-        // footer
-        el.pv_footerContact.textContent = safeText(c.email) || "—";
-        el.pv_footerWsp.textContent = safeText(c.whatsapp) || "—";
-        el.pv_footerRuc.textContent = safeText(c.ruc) || "—";
-        el.pv_footerContact2.textContent = safeText(c.email) || "—";
-        el.pv_footerWsp2.textContent = safeText(c.whatsapp) || "—";
-        el.pv_footerRuc2.textContent = safeText(c.ruc) || "—";
-
-        const showRuc = state.company.showRucFooter !== false;
-        el.pv_footerRucWrap.style.display = showRuc ? "inline-flex" : "none";
-        el.pv_footerRucWrap2.style.display = showRuc ? "inline-flex" : "none";
-
-        el.pv_detailSpecs.textContent = safeText(p2.detailSpecs);
-        el.pv_condsBody.innerHTML = (p2.conditions || []).map(cond=>`
-          <tr>
-            <td><b>${escapeHtml(safeText(cond.concepto))}</b></td>
-            <td>${escapeHtml(safeText(cond.detalle))}</td>
-          </tr>
-        `).join("") || `<tr><td colspan="2" class="muted">—</td></tr>`;
-
-        el.pv_acceptText.textContent = safeText(p2.acceptText);
-        el.pv_dni.textContent = safeText(p2.dni || "__________");
-        el.pv_signDate.textContent = safeText(p2.signDate || "__/__/20__");
-
-        const showWM = state.company.showWatermark === true;
-        el.pv_watermarkWrap.style.display = showWM ? "flex" : "none";
-        el.pv_watermarkImg.src = logoToUse;
-      }
-
-      function saveToStorage(){
-        try{
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-          setStatus("Guardado","ok");
-        }catch(e){
-          setStatus("Error al guardar","danger");
-          alert("No se pudo guardar. Si subiste un logo muy pesado, reduce el tamaño del logo e intenta otra vez.");
-        }
-      }
-
-      function loadFromStorage(){
-        try{
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return false;
-          const data = JSON.parse(raw);
-
-          state = deepClone(DEFAULTS);
-          state.company = Object.assign(state.company, data.company || {});
-          state.quote = Object.assign(state.quote, data.quote || {});
-          state.items = Array.isArray(data.items) ? data.items : deepClone(DEFAULTS.items);
-          state.page2 = Object.assign(state.page2, data.page2 || {});
-          state.page2.conditions = Array.isArray(state.page2.conditions) ? state.page2.conditions : deepClone(DEFAULTS.page2.conditions);
-
-          if (typeof state.company.showRucFooter !== "boolean") state.company.showRucFooter = true;
-          if (typeof state.company.showWatermark !== "boolean") state.company.showWatermark = true;
-
-          return true;
-        }catch(e){
-          return false;
-        }
-      }
-
-      function hydrateInputsFromState(){
-        el.companyName.value = state.company.name || "";
-        el.ruc.value = state.company.ruc || "";
-        el.address.value = state.company.address || "";
-        el.whatsapp.value = state.company.whatsapp || "";
-        el.phone.value = state.company.phone || "";
-        el.email.value = state.company.email || "";
-        el.showRucFooter.checked = state.company.showRucFooter !== false;
-        el.showWatermark.checked = state.company.showWatermark === true;
-
-        el.titleOverride.value = state.quote.titleOverride || "";
-        el.quoteNo.value = state.quote.no || "";
-        el.date.value = state.quote.date || todayISO();
-        el.client.value = state.quote.client || "";
-        el.project.value = state.quote.project || "";
-        el.summary.value = state.quote.summary || "";
-        el.discType.value = state.quote.discType || "PEN";
-        el.discValue.value = String(state.quote.discValue || 0);
-
-        el.detailSpecs.value = state.page2.detailSpecs || "";
-        el.acceptText.value = state.page2.acceptText || "";
-        el.signClient.value = state.page2.signClient || "";
-        el.signCompany.value = state.page2.signCompany || "";
-        el.dni.value = state.page2.dni || "";
-        el.signDate.value = state.page2.signDate || "";
-      }
-
-      function bindInputs(){
-        el.companyName.addEventListener("input", ()=>{ state.company.name = el.companyName.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.ruc.addEventListener("input", ()=>{ state.company.ruc = el.ruc.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.address.addEventListener("input", ()=>{ state.company.address = el.address.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.whatsapp.addEventListener("input", ()=>{ state.company.whatsapp = el.whatsapp.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.phone.addEventListener("input", ()=>{ state.company.phone = el.phone.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.email.addEventListener("input", ()=>{ state.company.email = el.email.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-
-        el.showRucFooter.addEventListener("change", ()=>{
-          state.company.showRucFooter = !!el.showRucFooter.checked;
-          renderPreview();
-          setStatus("Cambios sin guardar","danger");
         });
-        el.showWatermark.addEventListener("change", ()=>{
-          state.company.showWatermark = !!el.showWatermark.checked;
-          renderPreview();
-          setStatus("Cambios sin guardar","danger");
-        });
-
-        el.logo.addEventListener("change", async ()=>{
-          const file = el.logo.files?.[0];
-          if (!file) return;
-          if (!/image\/(png|jpeg)/.test(file.type)){
-            alert("Sube un PNG o JPG.");
-            el.logo.value = "";
-            return;
+        wrap.addEventListener("click", e=>{
+          if(e.target?.getAttribute?.("data-act")==="delete"){
+            state.items = state.items.filter(x=>x.id!==it.id);
+            renderItemsEditor(); renderPreview(); setStatus("Cambios sin guardar","danger");
           }
-          const r = new FileReader();
-          r.onload = ()=>{
-            state.company.logoDataUrl = r.result;
-            renderPreview();
-            setStatus("Logo cargado (sin guardar)","danger");
-          };
-          r.readAsDataURL(file);
         });
+        ed.appendChild(wrap);
+      });
+    }
 
-        el.titleOverride.addEventListener("input", ()=>{ state.quote.titleOverride = el.titleOverride.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.quoteNo.addEventListener("input", ()=>{ state.quote.no = el.quoteNo.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.date.addEventListener("input", ()=>{ state.quote.date = el.date.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.client.addEventListener("input", ()=>{ state.quote.client = el.client.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.project.addEventListener("input", ()=>{ state.quote.project = el.project.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.summary.addEventListener("input", ()=>{ state.quote.summary = el.summary.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.discType.addEventListener("change", ()=>{ state.quote.discType = el.discType.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.discValue.addEventListener("input", ()=>{ state.quote.discValue = parseFloat(el.discValue.value||"0")||0; renderPreview(); setStatus("Cambios sin guardar","danger"); });
+    /* =========================================================
+       RENDER: Condiciones editor
+    ========================================================= */
+    function renderCondsEditor(){
+      const ed = $("condsEditor");
+      ed.innerHTML = "";
+      $("condsCount").textContent = `${state.page2.conditions.length} condiciones`;
 
-        el.detailSpecs.addEventListener("input", ()=>{ state.page2.detailSpecs = el.detailSpecs.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.acceptText.addEventListener("input", ()=>{ state.page2.acceptText = el.acceptText.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.dni.addEventListener("input", ()=>{ state.page2.dni = el.dni.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-        el.signDate.addEventListener("input", ()=>{ state.page2.signDate = el.signDate.value; renderPreview(); setStatus("Cambios sin guardar","danger"); });
-
-        el.btnAddItem.addEventListener("click", ()=>{
-          state.items.push({ id: cryptoId(), include:true, ambiente:"", producto:"", descripcion:"", especificaciones:"", precio:0 });
-          renderItemsEditor(); renderPreview();
-          setStatus("Ítem agregado (sin guardar)","danger");
+      state.page2.conditions.forEach((c, idx)=>{
+        const wrap = document.createElement("div");
+        wrap.className = "cond";
+        wrap.innerHTML = `
+          <div class="cond__head">
+            <strong>Condición ${idx+1}</strong>
+            <button class="mini-btn del" data-act="delete" type="button">Eliminar</button>
+          </div>
+          <div class="grid2">
+            <div>
+              <label>Concepto</label>
+              <input type="text" data-act="concepto" value="${escapeAttr(c.concepto)}" />
+            </div>
+            <div>
+              <label>Detalle</label>
+              <input type="text" data-act="detalle" value="${escapeAttr(c.detalle)}" />
+            </div>
+          </div>
+        `;
+        wrap.addEventListener("input", e=>{
+          const act = e.target?.getAttribute?.("data-act");
+          if(act==="concepto") c.concepto = e.target.value;
+          if(act==="detalle")  c.detalle  = e.target.value;
+          renderPreview(); setStatus("Cambios sin guardar","danger");
         });
-
-        el.btnAddCond.addEventListener("click", ()=>{
-          state.page2.conditions.push({ id: cryptoId(), concepto:"", detalle:"" });
-          renderCondsEditor(); renderPreview();
-          setStatus("Condición agregada (sin guardar)","danger");
+        wrap.addEventListener("click", e=>{
+          if(e.target?.getAttribute?.("data-act")==="delete"){
+            state.page2.conditions = state.page2.conditions.filter(x=>x.id!==c.id);
+            renderCondsEditor(); renderPreview(); setStatus("Cambios sin guardar","danger");
+          }
         });
+        ed.appendChild(wrap);
+      });
+    }
 
-        el.btnSave.addEventListener("click", saveToStorage);
+    /* =========================================================
+       RENDER: Spec cell (tabla)
+    ========================================================= */
+    function renderSpecCell(text){
+      const raw = safeText(text).replace(/\r\n/g,"\n").trim();
+      if(!raw) return '<span class="muted">—</span>';
+      const lines = raw.split("\n").map(s=>s.trim()).filter(Boolean);
+      if(lines.length >= 2){
+        return `<ul class="spec-ul">${lines.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+      }
+      return `<p class="spec-p">${escapeHtml(raw)}</p>`;
+    }
 
-        el.btnReset.addEventListener("click", ()=>{
-          if (!confirm("¿Seguro? Se borrará lo guardado y se cargará el ejemplo por defecto.")) return;
-          localStorage.removeItem(STORAGE_KEY);
-          state = deepClone(DEFAULTS);
-          hydrateInputsFromState();
-          renderItemsEditor();
-          renderCondsEditor();
-          renderPreview();
-          setStatus("Reseteado","ok");
-        });
+    /* =========================================================
+       COMPUTE TOTALS
+    ========================================================= */
+    function computeTotals(){
+      const subtotal = state.items.filter(i=>i.include).reduce((a,i)=>a+(parseFloat(i.precio)||0),0);
+      const dv = parseFloat(state.quote.discValue)||0;
+      let disc = 0;
+      if(dv>0) disc = state.quote.discType==="PCT" ? subtotal*(dv/100) : dv;
+      disc = Math.min(disc, subtotal);
+      return { subtotal, discountAmount:disc, total:subtotal-disc };
+    }
 
-        el.btnPDF.addEventListener("click", ()=>{
-          setStatus("Abriendo impresión…","ok");
-          setTimeout(()=>window.print(), 120);
-        });
+    /* =========================================================
+       RENDER PREVIEW
+    ========================================================= */
+    function renderPreview(){
+      const c  = state.company;
+      const q  = state.quote;
+      const p2 = state.page2;
 
-        el.zoomRange.addEventListener("input", ()=>{
-          const z = parseFloat(el.zoomRange.value);
-          document.documentElement.style.setProperty("--doc-scale", String(z));
-          el.zoomLabel.textContent = Math.round(z*100)+"%";
-        });
+      const logoSrc = c.logoDataUrl || makePlaceholderLogo(c.name);
+
+      // Logos
+      $("pv_logo1").src = logoSrc;
+      $("pv_logo2").src = logoSrc;
+
+      // Nombres empresa
+      $("pv_companyName1").textContent = safeText(c.name);
+      $("pv_companyName2").textContent = safeText(c.name);
+      $("pv_companyName3").textContent = safeText(c.name).toUpperCase();
+      $("pv_companySub1").textContent  = safeText(c.sub);
+      $("pv_companySub2").textContent  = safeText(c.sub);
+
+      // N° y fecha en ambas páginas
+      $("pv_quoteNoTop").textContent  = safeText(q.no);
+      $("pv_dateTop").textContent     = safeText(q.date);
+      $("pv_quoteNoTop2").textContent = safeText(q.no);
+      $("pv_dateTop2").textContent    = safeText(q.date);
+
+      // Título
+      const autoTitle = `HOJA DE COTIZACIÓN - PROYECTO: ${(safeText(q.project).trim()||"—").toUpperCase()}`;
+      $("pv_title").textContent = safeText(q.titleOverride).trim() || autoTitle;
+
+      // Datos cliente
+      $("pv_client").textContent  = safeText(q.client);
+      $("pv_project").textContent = safeText(q.project);
+      $("pv_quoteNo").textContent = safeText(q.no);
+      $("pv_date").textContent    = safeText(q.date);
+
+      // Datos empresa
+      $("pv_ruc").textContent     = safeText(c.ruc);
+      $("pv_address").textContent = safeText(c.address);
+      const numero = [safeText(c.whatsapp).trim(),safeText(c.phone).trim()].filter(Boolean).join(" / ");
+      $("pv_phoneLine").textContent = numero || "—";
+      $("pv_emailLine").textContent = safeText(c.email).trim() || "—";
+
+      // Resumen
+      $("pv_summary").textContent = safeText(q.summary);
+
+      // Items
+      const rows = state.items.filter(i=>i.include).map(i=>{
+        const desc = safeText(i.descripcion).trim();
+        return `<tr>
+          <td>${escapeHtml(safeText(i.ambiente))}</td>
+          <td><b>${escapeHtml(safeText(i.producto))}</b></td>
+          <td>${renderSpecCell(i.especificaciones)}</td>
+          <td>${desc ? escapeHtml(desc) : '<span class="muted">—</span>'}</td>
+          <td class="price">${money(parseFloat(i.precio)||0)}</td>
+        </tr>`;
+      }).join("");
+      $("pv_itemsBody").innerHTML = rows || `<tr><td colspan="5" class="muted">No hay ítems incluidos. Activa "Incluir" en al menos un ítem.</td></tr>`;
+
+      // Totales
+      const {subtotal, discountAmount, total} = computeTotals();
+      $("pv_subtotal").textContent = money(subtotal);
+      $("pv_total").textContent    = money(total);
+      if(discountAmount>0.00001){
+        $("pv_discountRow").style.display = "flex";
+        $("pv_discount").textContent = q.discType==="PCT"
+          ? `- ${money(discountAmount)} (${(parseFloat(q.discValue)||0).toFixed(2)}%)`
+          : `- ${money(discountAmount)}`;
+      }else{
+        $("pv_discountRow").style.display = "none";
       }
 
-      function init(){
-        const loaded = loadFromStorage();
-        hydrateInputsFromState();
-        renderItemsEditor();
-        renderCondsEditor();
-        renderPreview();
+      // Footer
+      const email = safeText(c.email)||"—";
+      const wsp   = safeText(c.whatsapp)||"—";
+      const ruc   = safeText(c.ruc)||"—";
+      $("pv_footerContact").textContent  = email;
+      $("pv_footerWsp").textContent      = wsp;
+      $("pv_footerRuc").textContent      = ruc;
+      $("pv_footerContact2").textContent = email;
+      $("pv_footerWsp2").textContent     = wsp;
+      $("pv_footerRuc2").textContent     = ruc;
+      const showRuc = c.showRucFooter !== false;
+      $("pv_footerRucWrap").style.display  = showRuc ? "inline-flex" : "none";
+      $("pv_footerRucWrap2").style.display = showRuc ? "inline-flex" : "none";
 
-        document.documentElement.style.setProperty("--doc-scale", el.zoomRange.value);
-        el.zoomLabel.textContent = Math.round(parseFloat(el.zoomRange.value)*100) + "%";
+      // Página 2 contenido
+      $("pv_detailSpecs").textContent = safeText(p2.detailSpecs);
+      $("pv_condsBody").innerHTML = (p2.conditions||[]).map(cond=>`
+        <tr>
+          <td><b>${escapeHtml(safeText(cond.concepto))}</b></td>
+          <td>${escapeHtml(safeText(cond.detalle))}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="2" class="muted">—</td></tr>`;
 
-        bindInputs();
-        setStatus(loaded ? "Cargado desde guardado" : "Listo", "ok");
+      $("pv_acceptText").textContent = safeText(p2.acceptText);
+      $("pv_dni").textContent       = safeText(p2.dni||"__________");
+      $("pv_signDate").textContent  = safeText(p2.signDate||"__/__/20__");
+      $("pv_signCompanyLabel").textContent = safeText(c.name)||"Empresa";
+
+      // Marca de agua página 2
+      const showWM2 = c.showWatermark === true;
+      $("pv_watermarkWrap").style.display = showWM2 ? "flex" : "none";
+      $("pv_watermarkImg").src = logoSrc;
+
+      // Marca de agua página 1
+      const showWM1 = c.showWatermarkP1 === true;
+      $("pv_watermarkP1Wrap").style.display = showWM1 ? "flex" : "none";
+      $("pv_watermarkP1Img").src = logoSrc;
+    }
+
+    /* =========================================================
+       STORAGE
+    ========================================================= */
+    function saveToStorage(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        setStatus("Guardado","ok");
+      }catch(e){
+        setStatus("Error al guardar","danger");
+        alert("No se pudo guardar. Si subiste un logo muy pesado, reduce el tamaño e intenta de nuevo.");
       }
+    }
 
-      init();
-    })();
+    function loadFromStorage(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return false;
+        const data = JSON.parse(raw);
+        state = deepClone(DEFAULTS);
+        state.company = Object.assign(state.company, data.company||{});
+        state.quote   = Object.assign(state.quote,   data.quote||{});
+        state.items   = Array.isArray(data.items) ? data.items : deepClone(DEFAULTS.items);
+        state.page2   = Object.assign(state.page2,   data.page2||{});
+        state.page2.conditions = Array.isArray(state.page2.conditions) ? state.page2.conditions : deepClone(DEFAULTS.page2.conditions);
+        state.design  = Object.assign(deepClone(DEFAULTS.design), data.design||{});
+        if(typeof state.company.showRucFooter   !=="boolean") state.company.showRucFooter   = true;
+        if(typeof state.company.showWatermark   !=="boolean") state.company.showWatermark   = true;
+        if(typeof state.company.showWatermarkP1 !=="boolean") state.company.showWatermarkP1 = false;
+        return true;
+      }catch(e){ return false; }
+    }
+
+    /* =========================================================
+       HYDRATE INPUTS
+    ========================================================= */
+    function hydrateInputs(){
+      const c  = state.company;
+      const q  = state.quote;
+      const p2 = state.page2;
+      const d  = state.design;
+
+      $("in_companyName").value     = c.name||"";
+      $("in_companySub").value      = c.sub||"";
+      $("in_ruc").value             = c.ruc||"";
+      $("in_address").value         = c.address||"";
+      $("in_whatsapp").value        = c.whatsapp||"";
+      $("in_phone").value           = c.phone||"";
+      $("in_email").value           = c.email||"";
+      $("in_showRucFooter").checked = c.showRucFooter!==false;
+      $("in_showWatermark").checked = c.showWatermark===true;
+      $("in_showWatermarkP1").checked = c.showWatermarkP1===true;
+
+      $("in_titleOverride").value   = q.titleOverride||"";
+      $("in_quoteNo").value         = q.no||"";
+      $("in_date").value            = q.date||todayISO();
+      $("in_client").value          = q.client||"";
+      $("in_project").value         = q.project||"";
+      $("in_summary").value         = q.summary||"";
+      $("in_discType").value        = q.discType||"PEN";
+      $("in_discValue").value       = String(q.discValue||0);
+
+      $("in_detailSpecs").value     = p2.detailSpecs||"";
+      $("in_acceptText").value      = p2.acceptText||"";
+      $("in_signClient").value      = p2.signClient||"";
+      $("in_signCompany").value     = p2.signCompany||"";
+      $("in_dni").value             = p2.dni||"";
+      $("in_signDate").value        = p2.signDate||"";
+
+      $("in_colorMarron").value     = d.marron||"#7d644c";
+      $("in_colorBeige").value      = d.beige||"#e2d2b8";
+    }
+
+    /* =========================================================
+       BIND INPUTS
+    ========================================================= */
+    function bindInputs(){
+      function onInput(id, fn){ $(id).addEventListener("input",  fn); }
+      function onChange(id, fn){ $(id).addEventListener("change", fn); }
+      function dirty(){ setStatus("Cambios sin guardar","danger"); }
+
+      onInput("in_companyName", ()=>{ state.company.name    = $("in_companyName").value; renderPreview(); dirty(); });
+      onInput("in_companySub",  ()=>{ state.company.sub     = $("in_companySub").value;  renderPreview(); dirty(); });
+      onInput("in_ruc",         ()=>{ state.company.ruc     = $("in_ruc").value;         renderPreview(); dirty(); });
+      onInput("in_address",     ()=>{ state.company.address = $("in_address").value;     renderPreview(); dirty(); });
+      onInput("in_whatsapp",    ()=>{ state.company.whatsapp= $("in_whatsapp").value;    renderPreview(); dirty(); });
+      onInput("in_phone",       ()=>{ state.company.phone   = $("in_phone").value;       renderPreview(); dirty(); });
+      onInput("in_email",       ()=>{ state.company.email   = $("in_email").value;       renderPreview(); dirty(); });
+
+      onChange("in_showRucFooter",   ()=>{ state.company.showRucFooter   = $("in_showRucFooter").checked;   renderPreview(); dirty(); });
+      onChange("in_showWatermark",   ()=>{ state.company.showWatermark   = $("in_showWatermark").checked;   renderPreview(); dirty(); });
+      onChange("in_showWatermarkP1", ()=>{ state.company.showWatermarkP1 = $("in_showWatermarkP1").checked; renderPreview(); dirty(); });
+
+      onChange("in_logo", async ()=>{
+        const file = $("in_logo").files?.[0];
+        if(!file) return;
+        if(!/image\/(png|jpeg)/.test(file.type)){ alert("Sube un PNG o JPG."); $("in_logo").value=""; return; }
+        const r = new FileReader();
+        r.onload = ()=>{ state.company.logoDataUrl = r.result; renderPreview(); setStatus("Logo cargado (sin guardar)","danger"); };
+        r.readAsDataURL(file);
+      });
+
+      onInput("in_titleOverride", ()=>{ state.quote.titleOverride = $("in_titleOverride").value; renderPreview(); dirty(); });
+      onInput("in_quoteNo",       ()=>{ state.quote.no            = $("in_quoteNo").value;       renderPreview(); dirty(); });
+      onInput("in_date",          ()=>{ state.quote.date          = $("in_date").value;          renderPreview(); dirty(); });
+      onInput("in_client",        ()=>{ state.quote.client        = $("in_client").value;        renderPreview(); dirty(); });
+      onInput("in_project",       ()=>{ state.quote.project       = $("in_project").value;       renderPreview(); dirty(); });
+      onInput("in_summary",       ()=>{ state.quote.summary       = $("in_summary").value;       renderPreview(); dirty(); });
+      onChange("in_discType",     ()=>{ state.quote.discType      = $("in_discType").value;      renderPreview(); dirty(); });
+      onInput("in_discValue",     ()=>{ state.quote.discValue     = parseFloat($("in_discValue").value||"0")||0; renderPreview(); dirty(); });
+
+      onInput("in_detailSpecs", ()=>{ state.page2.detailSpecs = $("in_detailSpecs").value; renderPreview(); dirty(); });
+      onInput("in_acceptText",  ()=>{ state.page2.acceptText  = $("in_acceptText").value;  renderPreview(); dirty(); });
+      onInput("in_signClient",  ()=>{ state.page2.signClient  = $("in_signClient").value;  renderPreview(); dirty(); });
+      onInput("in_signCompany", ()=>{ state.page2.signCompany = $("in_signCompany").value; renderPreview(); dirty(); });
+      onInput("in_dni",         ()=>{ state.page2.dni         = $("in_dni").value;         renderPreview(); dirty(); });
+      onInput("in_signDate",    ()=>{ state.page2.signDate    = $("in_signDate").value;    renderPreview(); dirty(); });
+
+      $("btnApplyCustomColor").addEventListener("click", ()=>{
+        state.design.themeId = "custom";
+        state.design.marron  = $("in_colorMarron").value;
+        state.design.beige   = $("in_colorBeige").value;
+        applyDesign();
+        renderThemeGrid(); // quita "active" de todos
+        dirty();
+      });
+
+      $("btnAddItem").addEventListener("click", ()=>{
+        state.items.push({ id:cryptoId(), include:true, ambiente:"", producto:"", descripcion:"", especificaciones:"", precio:0 });
+        renderItemsEditor(); renderPreview(); setStatus("Ítem agregado (sin guardar)","danger");
+      });
+      $("btnAddCond").addEventListener("click", ()=>{
+        state.page2.conditions.push({ id:cryptoId(), concepto:"", detalle:"" });
+        renderCondsEditor(); renderPreview(); setStatus("Condición agregada (sin guardar)","danger");
+      });
+
+      $("btnSave").addEventListener("click", saveToStorage);
+
+      $("btnReset").addEventListener("click", ()=>{
+        if(!confirm("¿Seguro? Se borrará lo guardado y se cargará el ejemplo por defecto.")) return;
+        localStorage.removeItem(STORAGE_KEY);
+        state = deepClone(DEFAULTS);
+        hydrateInputs(); renderItemsEditor(); renderCondsEditor();
+        applyDesign(); renderThemeGrid(); renderFontGrid();
+        renderPreview(); setStatus("Reseteado","ok");
+      });
+
+      /* ======= PDF: nombre de archivo automático ======= */
+      $("btnPDF").addEventListener("click", ()=>{
+        const empresa = (safeText(state.company.name).trim()||"Empresa").replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-]/g,"").trim();
+        const cliente = (safeText(state.quote.client).trim()||"Cliente").replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\-]/g,"").trim();
+        const numero  = (safeText(state.quote.no).trim()||"COT").replace(/[^a-zA-Z0-9\-_]/g,"").trim();
+        const oldTitle = document.title;
+        document.title = `${empresa} - ${cliente} - ${numero}`;
+        setStatus("Abriendo impresión…","ok");
+        setTimeout(()=>{
+          window.print();
+          setTimeout(()=>{ document.title = oldTitle; }, 2000);
+        }, 120);
+      });
+
+      $("zoomRange").addEventListener("input", ()=>{
+        const z = parseFloat($("zoomRange").value);
+        document.documentElement.style.setProperty("--doc-scale", String(z));
+        $("zoomLabel").textContent = Math.round(z*100)+"%";
+      });
+    }
+
+    /* =========================================================
+       INIT
+    ========================================================= */
+    function init(){
+      const loaded = loadFromStorage();
+      hydrateInputs();
+      applyDesign();
+      renderThemeGrid();
+      renderFontGrid();
+      renderItemsEditor();
+      renderCondsEditor();
+      renderPreview();
+      const z = parseFloat($("zoomRange").value);
+      document.documentElement.style.setProperty("--doc-scale", String(z));
+      $("zoomLabel").textContent = Math.round(z*100)+"%";
+      bindInputs();
+      setStatus(loaded ? "Cargado desde guardado" : "Listo", "ok");
+    }
+
+    init();
+  })();
   </script>
 </body>
 </html>
